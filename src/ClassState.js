@@ -22,6 +22,7 @@ class ClassState extends React.Component {
     // componentDidMount(){
     //     console.log('componentDidMount')
     // }
+
     componentDidUpdate() {
         console.log('actualizacion');
 
@@ -29,11 +30,11 @@ class ClassState extends React.Component {
 
             setTimeout( () => {
                 console.log('haciendo la validacion');
+                this.setState({ loading:false });
                 if (SECURITY_CODE  === this.state.value){
-
-                    this.setState({ error:false,loading:false });
+                    this.setState({ error:false });
                 }else {
-                    this.setState({ error:true, loading:false });
+                    this.setState({ error:true });
                     
                 }
                 console.log('terminando validacion');
@@ -42,23 +43,24 @@ class ClassState extends React.Component {
     }
 
     render() {
-        const {name, error, loading, value} = this.state
+         //Podría hacer destructuracion de datos así escribir solo las propiedades sin el this...
+       // const {name, error, loading, value} = this.state
         return (
             <div>
-                <h2>Eliminar {name}</h2>
+                <h2>Eliminar {this.props.name}</h2>
                 <p>Por favor, escribe el código de seguridad . </p>
 
-                {(error && !loading)  && (
+                {(this.state.error && !this.state.loading)  && (
                     <p>Error: El código es incorrecto</p>
                 )}
 
-                {loading && (
+                {this.state.loading && (
                     <Loading />
                 )}
 
                 <input 
                     placeholder='código de seguridad'
-                    value = { value }
+                    value = { this.state.value }
                     onChange={ (e) => {
                         this.setState({value: e.target.value});
                     }}

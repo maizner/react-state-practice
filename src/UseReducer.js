@@ -2,6 +2,57 @@ import React from "react";
 
 const SECURITY_CODE = 'paradigma';
 
+const actionTypes = {
+    confirm: 'CONFIRM',
+    error: 'ERROR',
+    write: 'WRITE',
+    check: 'CHECK',
+    delete: 'DELETE',
+    reset: 'RESET'
+
+}
+const reducerObject =  (state, payload) => ({
+    [actionTypes.error]:{
+        ...state,
+        error:true,
+        loading:false
+    }, 
+    [actionTypes.write]:{
+        ...state,
+        value:payload
+    },
+    [actionTypes.check]:{
+        ...state,
+        loading:true
+    },
+    [actionTypes.confirm]:{
+        ...state,
+        confirmed:true,
+        error:false,
+        loading:false
+    },
+    [actionTypes.delete]:{
+        ...state,
+        deleted: true 
+    },
+    [actionTypes.reset]:{
+        ...state,
+        confirmed:false, 
+        deleted:false, 
+        value:''
+    }
+});
+
+// validacion de si el action type existe dentro del objeto de reducerObject
+const reducer  = (state, action) => {
+    if (reducerObject(state)[action.type]){
+        return reducerObject(state, action.payload)[action.type]
+    }else{
+        return state;
+    }
+}
+
+
 function UseReducer({name}) {
 
     const initialState = {
@@ -11,14 +62,27 @@ function UseReducer({name}) {
         deleted: false,
         confirmed:false
     }
+    //Action Creator 
+    const handleConfirm = () => {
+        dispatch({type:actionTypes.confirm})
+    }
+    const handleError = () => {
+        dispatch({type:actionTypes.error})
+    }
+    const handleWrite = (event) => {
+        dispatch({type:actionTypes.write, payload: event.target.value})
+    }
+    const handleDelete = () => {
+        dispatch({type:actionTypes.delete})
+    }
+    const handleCheck = () => {
+        dispatch({type:actionTypes.check})
+    }
+    const handleReset = () => {
+        dispatch({type:actionTypes.reset})
+    }
+   
     const [state, dispatch] = React.useReducer(reducer, initialState);
-
-
-    // const handleGetInputValue = (newValue) => {
-    //     setState( PrevState => ({ ...PrevState , value: newValue })) 
-    // }
-
-
 
     React.useEffect(() => {
 
@@ -26,11 +90,9 @@ function UseReducer({name}) {
 
             setTimeout(()=> {
                 if (state.value === SECURITY_CODE) {
-                    dispatch( { type: 'CONFIRM' } )
-                    
+                    handleConfirm()
                 }else{
-                    dispatch( { type: 'ERROR' } )
-                 
+                    handleError()
                 }
         
             }, 3000)
@@ -55,16 +117,12 @@ function UseReducer({name}) {
     
                 <input 
                     placeholder='código de seguridad'
-                    value = {state.value}
-                    onChange= {(event) => {
-                        dispatch( { type: 'WRITE', payload: event.target.value } )
-                    }}
+                    value = { state.value }
+                    onChange= { handleWrite } 
                 />
                 <button
                 //entraremos en el efecto
-                onClick={ () => 
-                    dispatch( { type: 'CHECK' } )
-                }
+                onClick={ handleCheck }
                 >Comprobar</button>
             </div>
         );
@@ -73,75 +131,25 @@ function UseReducer({name}) {
             <>
                 <p>Estas seguro de que deseas eliminar?</p>
                 <button 
-                    onClick={ () => 
-                        dispatch( { type: 'DELETE' } )
-                     }
-                >Eliminar</button>
+                    onClick={ handleDelete } >Eliminar</button>
 
                 <button
-                    onClick={ () =>
-                        dispatch( { type: 'RESET' } )
-                         }
-                >Cancelar</button>
+                    onClick={ handleReset } >Cancelar</button>
             </>
         )
 
     }else {
        
         setTimeout(()=> {
-            dispatch( { type: 'RESET' } )
+            handleReset()
         }, 3000)
 
-        return(
-            
-            
-            <>
-                <p>La tarea fue eliminada con exito</p>
-                
-            </>
-        )
+        return <p>La tarea fue eliminada con exito</p>  
     }
 }
 
-const reducerObject =  (state, payload) => ({
-    'ERROR':{
-        ...state,
-        error:true,
-        loading:false
-    }, 
-    'WRITE':{
-        ...state,
-        value:payload
-    },
-     'CHECK':{
-        ...state,
-        loading:true
-    },
-    'CONFIRM':{
-        ...state,
-        confirmed:true,
-        error:false,
-        loading:false
-    },
-    'DELETE':{
-        ...state,
-        deleted: true 
-    },
-    'RESET':{
-        ...state,
-        confirmed:false, 
-        deleted:false, 
-        value:''
-    }
-});
 
-// validacion de si el action type existe dentro del objeto de reducerObject
-const reducer  = (state, action) => {
-    if (reducerObject(state)[action.type]){
-        return reducerObject(state, action.payload)[action.type]
-    }else{
-        return state;
-    }
-}
+
+
     
 export {  UseReducer };
